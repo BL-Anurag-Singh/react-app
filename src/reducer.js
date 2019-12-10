@@ -1,5 +1,5 @@
 let initialState = {
-  loggedIn: true
+  loggedIn: false
 };
 
 function reducer(state = initialState, action) {
