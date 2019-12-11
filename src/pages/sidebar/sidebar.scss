@@ -1,0 +1,56 @@
+.keep-sidebar {
+  position: absolute;
+}
+
+.divider {
+  border-bottom: 1px solid #ddd;
+}
+
+ul {
+  margin: 0;
+  padding: 8px 0;
+}
+
+li {
+  cursor: pointer;
+  padding-left: 24px;
+}
+
+.active-route {
+  background-color: #feefc3;
+  border-radius: 0 25px 25px 0;
+}
+
+// a {
+//   display: 'flex';
+// }
+
+.label {
+  font-weight: 500;
+  color: #5f6368;
+  text-align: left;
+  cursor: default;
+  padding: 15px 24px 10px;
+}
+
+span {
+    color: black;
+  padding-left: 32px;
+  display: inline-block;
+  line-height: 40px;
+  vertical-align: top;
+  width: 176px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+}
+
+.sidebar-icon {
+    color: black;
+  height: 24px;
+  width: 24px;
+  float: left;
+  margin-top: 8px !important;
+  vertical-align: middle;
+}

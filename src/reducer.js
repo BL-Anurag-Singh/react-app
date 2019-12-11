@@ -1,5 +1,5 @@
 let initialState = {
-  loggedIn: false
+  loggedIn: true
 };
 
 function reducer(state = initialState, action) {
@@ -9,7 +9,7 @@ function reducer(state = initialState, action) {
     case "LOGOUT":
       return { loggedIn: action.payload };
     default:
-      return { loggedIn: true };
+      return initialState;
   }
 }
 

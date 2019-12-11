@@ -1,7 +1,7 @@
-import React from "react";
-import { Redirect } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState } from "react";
 import Header from "../../component/header/header";
+import Sidebar from "../sidebar/sidebar";
+import BodySection from "../bodySection/bodySection";
 
 const viewList = {
   l: "list",
@@ -9,30 +9,44 @@ const viewList = {
 };
 
 function Home() {
-  // const isLoggedIn = useSelector(state => state.loggedIn);
-  // const [filter, setFilter] = useState("");
-  // const [viewType, setViewType] = useState(viewList['l']);
-  // const [title, setTitle] = useState('Keep')
-  // const dispatch = useDispatch(null);
-  
+  const [filter, setFilter] = useState("");
+  const [toogle, setToogle] = useState(false);
+  const [viewType, setViewType] = useState(viewList["l"]);
+  const [title, setTitle] = useState("Keep");
 
-  // function logoutHandler() {
-  //   dispatch({ type: "LOGOUT", payload: false });
-  // }
-  // console.log(isLoggedIn, '------->')
+  function onTitleChange(name) {
+    console.log(name)
+    setTitle(name);
+  }
+
+  function onSearchValueChange(e) {
+    setFilter(e.target.value);
+  }
+
+  function onViewTypeChange(type) {
+    console.log(type)
+    type === 'list' ? setViewType('grid') : setViewType('list')
+    ;
+  }
+
+  function onMenuIconClick() {
+    console.log(toogle)
+    setToogle(!toogle);
+  }
+
   return (
-    <h1>hello u r inside home</h1>
-    // <>
-    //   <div>
-    //     {isLoggedIn && (
-    //       <div>
-    //         <Header title={title}></Header>
-    //         {/* <button onClick={logoutHandler}>Logout</button> */}
-    //       </div>
-    //     )}
-    //   </div>
-    //   {!isLoggedIn && <Redirect to="/"></Redirect>}
-    // </>
+    <div>
+      <Header
+        title={title}
+        onMenuIconClick={onMenuIconClick}
+        onSearchValueChange={onSearchValueChange}
+        viewType={viewType}
+        onViewTypeChange={onViewTypeChange}
+      ></Header>
+
+      <Sidebar toggle={toogle} onTitleChange={onTitleChange}></Sidebar>
+      <BodySection toggle={toogle}> </BodySection>
+    </div>
   );
 }
 
