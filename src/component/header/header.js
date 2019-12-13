@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // import MenuIcon from "@material-ui/icons/Menu";
 import { useDispatch } from "react-redux";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -16,6 +16,10 @@ function Header(props) {
     dispatch({ type: "LOGOUT", payload: false });
   }
 
+  useEffect(() => {
+    onBlurEvent()
+  }, [])
+
   function onBlurEvent(e) {
     document.getElementById("searchDiv").style.backgroundColor =
       "rgb(241, 243, 244)";
@@ -25,6 +29,7 @@ function Header(props) {
 
   function onSearchClick(e) {
     document.getElementById("searchDiv").style.background = "white";
+    document.getElementById("searchDiv").style.boxShadow = '0 1px 1px 0 rgba(65,69,73,0.1), 0 1px 3px 1px rgba(65,69,73,0.15)';
     document.getElementById("search").style.background = "white";
   }
 
