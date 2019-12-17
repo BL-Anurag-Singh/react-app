@@ -6,52 +6,45 @@ import EmojiObjectsIcon from "@material-ui/icons/EmojiObjects";
 import EditIcon from "@material-ui/icons/Edit";
 import LabelIcon from "@material-ui/icons/Label";
 import "./sidebar.scss";
-import { NavLink } from "react-router-dom";
 import EditLabelDialog from "../../component/Dialogs/editLabelDialog";
-
-const sideNavObject = [
-  {
-    icon: <EmojiObjectsIcon />,
-    title: "Notes",
-    section: "top",
-    dynamic: false,
-    isEditable: false
-  },
-  {
-    icon: <NotificationsIcon />,
-    title: "Reminder",
-    section: "top",
-    dynamic: false,
-    isEditable: false
-  }
-];
 
 let labelArrayList = [
   {
     title: "Label 1",
-    index: 1
+    index: 1,
+    isHovered: false,
+    isEditable: false
   },
   {
     title: "Label 2",
-    index: 2
+    index: 2,
+    isHovered: false,
+    isEditable: false
   },
   {
     title: "Label 3",
-    index: 3
+    index: 3,
+    isHovered: false,
+    isEditable: false
   },
   {
     title: "Label 4",
-    index: 4
+    index: 4,
+    isHovered: false,
+    isEditable: false
   },
   {
     title: "Label 5",
-    index: 5
+    index: 5,
+    isHovered: false,
+    isEditable: false
   }
 ];
 
 function Sidebar(props) {
+  const [nodeId, setNodeId] = useState([]);
   const [open, setOpen] = useState(false);
-  const [labelArray, setLAbelArray] = useState(labelArrayList)
+  const [labelArray, setLAbelArray] = useState(labelArrayList);
   function editLables() {
     setOpen(true);
     console.log("inside editable");
@@ -61,24 +54,79 @@ function Sidebar(props) {
     setOpen(false);
   }
 
-  function onLabelChange(label) {
-    setLAbelArray([...labelArray, label]) ;
-    console.log(labelArray)
+  function onTitleChange(title) {
+    setNodeId([...nodeId, title]);
+    nodeId.map(id => {
+      document.getElementById(id).style.background = "transparent";
+      document.getElementById(id).style.borderRadius = "";
+    });
+    props.onTitleChange(title);
+    document.getElementById(title).style.background = "#feefc3";
+    document.getElementById(title).style.borderRadius = "0 25px 25px 0";
   }
+
+  function newLabelHandler(label) {
+    setLAbelArray([...labelArray, label]);
+    console.log(labelArray);
+  }
+
+  function editLabelHandler(label, type) {
+    if (type === "hover") {
+      const modifiedLabelArray = labelArray.map(item => {
+        if (label.title === item.title) {
+          item.isHovered = true;
+        }
+        return item;
+      });
+      setLAbelArray(modifiedLabelArray);
+    } else if (type === "leave") {
+      const modifiedLabelArray = labelArray.map(item => {
+        if (label.title === item.title) {
+          item.isHovered = false;
+        }
+        return item;
+      });
+      setLAbelArray(modifiedLabelArray);
+    } else if (type === "edit") {
+      const modifiedLabelArray = labelArray.map(item => {
+        if (label.title === item.title) {
+          item.isEditable = !item.isEditable;
+        }
+        return item;
+      });
+      setLAbelArray(modifiedLabelArray);
+    } else if (type === "save") {
+      const modifiedLabelArray = labelArray.map(item => {
+        if (label.title === item.title) {
+          item.isEditable = !item.isEditable;
+        }
+        return item;
+      });
+      setLAbelArray(modifiedLabelArray);
+    } else {
+      const modifiedLabelArray = labelArray.map(item => {
+        if (label.index === item.index) {
+          item.title = type
+          item.isEditable = !label.isEditable;
+        }
+        return item;
+      });
+      setLAbelArray(modifiedLabelArray);
+    }
+  }
+
   return (
     <>
       {props.toggle && (
         <div className="keep-sidebar" style={{ width: "280px" }}>
           <ul className="divider">
-            <li onClick={() => props.onTitleChange("Keep")}>
-              <NavLink to="/home" activeClassName="active-route">
-                <div>
-                  <EmojiObjectsIcon className="sidebar-icon" />
-                  {<span>Notes</span>}
-                </div>
-              </NavLink>
+            <li id="Keep" onClick={e => onTitleChange("Keep")}>
+              <div>
+                <EmojiObjectsIcon className="sidebar-icon" />
+                {<span>Notes</span>}
+              </div>
             </li>
-            <li onClick={() => props.onTitleChange("Reminder")}>
+            <li id="Reminder" onClick={e => onTitleChange("Reminder")}>
               <div>
                 <NotificationsIcon className="sidebar-icon" />
                 <span>Reminder</span>
@@ -90,8 +138,9 @@ function Sidebar(props) {
             <div className="label">LABELS</div>
             {labelArray.map(label => (
               <li
+                id={label.title}
                 key={label.index}
-                onClick={() => props.onTitleChange(label.title)}
+                onClick={e => onTitleChange(label.title)}
               >
                 <div>
                   <LabelIcon className="sidebar-icon" />
@@ -107,13 +156,13 @@ function Sidebar(props) {
             </li>
           </ul>
           <ul className="divider">
-            <li onClick={() => props.onTitleChange("Archive")}>
+            <li id="Archive" onClick={e => onTitleChange("Archive")}>
               <div>
                 <ArchiveIcon className="sidebar-icon" />
                 <span>Archive</span>
               </div>
             </li>
-            <li onClick={() => props.onTitleChange("Delete")}>
+            <li id="Delete" onClick={e => onTitleChange("Delete")}>
               <div>
                 <DeleteIcon className="sidebar-icon" />
                 <span>Delete</span>
@@ -127,7 +176,8 @@ function Sidebar(props) {
         open={open}
         closeDialog={closeDialog}
         labelList={labelArray}
-        onLabelChange={onLabelChange}
+        newLabelHandler={newLabelHandler}
+        editLabelHandler={editLabelHandler}
       />
     </>
   );
