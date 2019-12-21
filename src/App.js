@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from "react";
+import React from "react";
 import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
 import "./App.scss";
 import { useSelector } from "react-redux";
@@ -41,27 +41,11 @@ function App() {
               component={Home}
             ></PrivateRouter>
             <Route component={NoMatch} />
-            
           </Switch>
         </BrowserRouter>
       </header>
     </div>
   );
 }
-
-// function App() {
-//   const observed = useRef(null);
-
-//   useEffect(() => {
-//     console.log(observed.current);
-//   }, []);
-
-//   return (
-//     <div ref={observed} className="App">
-//       <h1>Hello CodeSandbox</h1>
-//       <h2>Start editing to see some magic happen!</h2>
-//     </div>
-//   );
-// }
 
 export default App;

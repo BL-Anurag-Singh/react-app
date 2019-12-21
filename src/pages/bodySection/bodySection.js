@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense, Fragment } from "react";
 import AddAlertIcon from "@material-ui/icons/AddAlert";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import ColorLensIcon from "@material-ui/icons/ColorLens";
@@ -11,6 +11,11 @@ import ColorizeOutlinedIcon from "@material-ui/icons/ColorizeOutlined";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import ClearOutlinedIcon from "@material-ui/icons/ClearOutlined";
 import "./bodySection.scss";
+import Masonry from "react-masonry-component";
+import fetchData from "../../pages/fakeApi";
+import ReminderPopup from "../../component/popover/reminder";
+// import ColorPopup from "../../component/popover/color";
+import { Popover } from "@material-ui/core";
 
 const getStyle = toggle => {
   if (toggle) {
@@ -29,9 +34,13 @@ const viewTypes = {
   t: "text"
 };
 
+const resource = fetchData();
+
 function BodySection(props) {
   const [listName, setListName] = useState("");
   const [listItems, setListItems] = useState([]);
+  const [reminderEl, setReminderEl] = useState(null);
+  const [colorEl, setColorEl] = useState(null);
   const [completedItem, setCompletedItem] = useState([]);
   const noteRef = useRef();
   const [isInputExpanded, setIsInputExpanded] = useState(false);
@@ -92,66 +101,91 @@ function BodySection(props) {
   }
 
   function onItemHover(label) {
-    const modifiedList = listItems.map((item) => {
-      if(item.title === label.title) {
-        label.isHovered = true
+    const modifiedList = listItems.map(item => {
+      if (item.title === label.title) {
+        label.isHovered = true;
       }
-      return item
-    })
-   
-    setListItems(modifiedList)
+      return item;
+    });
+
+    setListItems(modifiedList);
   }
 
   function onItemLeave(label) {
-    const modifiedList = listItems.map((item) => {
-      if(item.title === label.title) {
-        label.isHovered = false
+    const modifiedList = listItems.map(item => {
+      if (item.title === label.title) {
+        label.isHovered = false;
       }
-      return item
-    })
-    setListItems(modifiedList)
+      return item;
+    });
+    setListItems(modifiedList);
   }
 
   function checkBoxClicked(item) {
     item.isCompleted = true;
     setCompletedItem([...completedItem, item]);
 
-    const val = listItems.filter(task => task.isCompleted === !item.isCompleted);
-    console.log(val)
+    const val = listItems.filter(
+      task => task.isCompleted === !item.isCompleted
+    );
+    console.log(val);
     setListItems(val);
   }
 
   function checkboxClickHandler(item) {
     item.isCompleted = false;
-    const val = completedItem.filter(task => task.isCompleted === !item.isCompleted);
-    setCompletedItem(val)
+    const val = completedItem.filter(
+      task => task.isCompleted === !item.isCompleted
+    );
+    setCompletedItem(val);
 
-    setListItems([...listItems, item])
+    setListItems([...listItems, item]);
   }
 
   function onCompletedItemHover(label) {
-    const modifiedList = completedItem.map((item) => {
-      if(item.title === label.title) {
-        label.isHovered = true
+    const modifiedList = completedItem.map(item => {
+      if (item.title === label.title) {
+        label.isHovered = true;
       }
-      return item
-    })
-    setCompletedItem(modifiedList)
+      return item;
+    });
+    setCompletedItem(modifiedList);
   }
 
   function onCompletedItemLeave(label) {
-    const modifiedList = completedItem.map((item) => {
-      if(item.title === label.title) {
-        label.isHovered = false
+    const modifiedList = completedItem.map(item => {
+      if (item.title === label.title) {
+        label.isHovered = false;
       }
-      return item
-    })
-    setCompletedItem(modifiedList)
+      return item;
+    });
+    setCompletedItem(modifiedList);
   }
 
   function textNoteHandler(e) {
-    console.log(e.target.value)
+    console.log(e.target.value);
   }
+
+  const handleReminderClick = event => {
+    setReminderEl(event.currentTarget);
+  };
+
+  const handleColorClick = event => {
+    setColorEl(event.currentTarget);
+  };
+
+  const handleColorClose = val => {
+    setColor(val);
+    setColorEl(null);
+  };
+
+  const handleReminderClose = val => {
+    setRemindMe(val);
+    setReminderEl(null);
+  };
+
+  const reminderPopover = Boolean(reminderEl);
+  const colorPopOver = Boolean(colorEl);
 
   useEffect(() => {
     if (noteRef.current) {
@@ -228,9 +262,13 @@ function BodySection(props) {
                         type="checkbox"
                         style={{ marginRight: "15px" }}
                       />
-                      <p style={{ margin: 0, flexGrow: 1, textAlign:'left' }}>{item.title}</p>
+                      <p style={{ margin: 0, flexGrow: 1, textAlign: "left" }}>
+                        {item.title}
+                      </p>
                       {item.isHovered && !item.isCompleted && (
-                        <ClearOutlinedIcon style={{fontSize: '24px'}}></ClearOutlinedIcon>
+                        <ClearOutlinedIcon
+                          style={{ fontSize: "24px" }}
+                        ></ClearOutlinedIcon>
                       )}
                     </div>
                   ))}
@@ -267,424 +305,337 @@ function BodySection(props) {
                         onChange={() => checkboxClickHandler(item)}
                         style={{ marginRight: "15px" }}
                       />
-                      <p style={{ margin: 0, flexGrow: 1, textAlign: 'left' }}>{item.title}</p>
+                      <p style={{ margin: 0, flexGrow: 1, textAlign: "left" }}>
+                        {item.title}
+                      </p>
                       {item.isHovered && item.isCompleted && (
-                        <ClearOutlinedIcon  style={{fontSize: '24px'}}></ClearOutlinedIcon>
+                        <ClearOutlinedIcon
+                          style={{ fontSize: "24px" }}
+                        ></ClearOutlinedIcon>
                       )}
                     </div>
                   ))}
               </div>
             )}
             <div className="add-new-note-section">
-              <AddAlertIcon title='Remind me'  ></AddAlertIcon>
-              <PersonAddIcon title='collaberator'></PersonAddIcon>
-              <ColorLensIcon title='Change color'></ColorLensIcon>
-              <ImageIcon title='add image'></ImageIcon>
-              <ArchiveIcon title='archive'></ArchiveIcon>
+              <AddAlertIcon
+                title="Remind me"
+                variant="contained"
+                color="primary"
+                onClick={handleReminderClick}
+              ></AddAlertIcon>
+              <ReminderPopup
+                open={reminderPopover}
+                anchorEl={reminderEl}
+                handleClose={handleReminderClose}
+              />
+              <PersonAddIcon></PersonAddIcon>
+              <ColorLensIcon title="Change color" onClick={handleColorClick}>
+                <ColorPopup 
+                 open1 = {colorPopOver}
+                 anchorEl1 = {colorEl}></ColorPopup>
+              </ColorLensIcon>
+              <ImageIcon title="add image"></ImageIcon>
+              <ArchiveIcon title="archive"></ArchiveIcon>
               <MoreVertIcon></MoreVertIcon>
               <button onClick={submitHandler}> Close</button>
             </div>
           </div>
         )}
       </div>
-      <div>
-                        
-      </div>
+      <Suspense fallback={<h1>Loading Notes...</h1>}>
+        <UserNotes title={props.title} notes={props.notes} />
+      </Suspense>
     </div>
   );
 }
 
-const data = [
-  {
-    title: "Dhaval",
-    description: "asdfjljflk",
-    isPined: false,
-    isArchived: false,
-    isDeleted: true,
-    reminder: [],
-    createdDate: "2019-07-06T09:28:52.404Z",
-    modifiedDate: "2019-07-06T09:28:52.404Z",
-    color: "#3FEEE6",
-    label: [],
-    imageUrl: "",
-    linkUrl: "",
-    collaborators: [],
-    id: "5d2069d4042ffb004053e6fa",
-    userId: "5d10734bd0c1c70040b4b6d7",
-    collaberator: [],
-    noteCheckLists: [],
-    noteLabels: [],
-    questionAndAnswerNotes: [],
-    user: {
-      firstName: "Krushna",
-      lastName: "Nikam",
-      imageUrl: "images/1566972270319.jpg",
-      role: "user",
-      service: "advance",
-      createdDate: "2019-06-24T06:52:59.502Z",
-      modifiedDate: "2019-06-24T06:52:59.502Z",
-      addresses: [
-        {
-          address: "Aurangabad"
-        }
-      ],
-      username: "Krushnanikam26@gmail.com",
-      email: "Krushnanikam26@gmail.com",
-      emailVerified: true,
-      id: "5d10734bd0c1c70040b4b6d7"
-    }
-  },
-  {
-    title: "Dhaval",
-    description: "asdfjljflk",
-    isPined: false,
-    isArchived: false,
-    isDeleted: true,
-    reminder: [],
-    createdDate: "2019-07-06T09:28:52.404Z",
-    modifiedDate: "2019-07-06T09:28:52.404Z",
-    color: "#3FEEE6",
-    label: [],
-    imageUrl: "",
-    linkUrl: "",
-    collaborators: [],
-    id: "5d2069d4042ffb004053e6fa",
-    userId: "5d10734bd0c1c70040b4b6d7",
-    collaberator: [],
-    noteCheckLists: [],
-    noteLabels: [],
-    questionAndAnswerNotes: [],
-    user: {
-      firstName: "Krushna",
-      lastName: "Nikam",
-      imageUrl: "images/1566972270319.jpg",
-      role: "user",
-      service: "advance",
-      createdDate: "2019-06-24T06:52:59.502Z",
-      modifiedDate: "2019-06-24T06:52:59.502Z",
-      addresses: [
-        {
-          address: "Aurangabad"
-        }
-      ],
-      username: "Krushnanikam26@gmail.com",
-      email: "Krushnanikam26@gmail.com",
-      emailVerified: true,
-      id: "5d10734bd0c1c70040b4b6d7"
-    }
-  },
-  {
-    title: "Dhaval",
-    description: "asdfjljflk",
-    isPined: false,
-    isArchived: false,
-    isDeleted: true,
-    reminder: [],
-    createdDate: "2019-07-06T09:28:52.404Z",
-    modifiedDate: "2019-07-06T09:28:52.404Z",
-    color: "#3FEEE6",
-    label: [],
-    imageUrl: "",
-    linkUrl: "",
-    collaborators: [],
-    id: "5d2069d4042ffb004053e6fa",
-    userId: "5d10734bd0c1c70040b4b6d7",
-    collaberator: [],
-    noteCheckLists: [],
-    noteLabels: [],
-    questionAndAnswerNotes: [],
-    user: {
-      firstName: "Krushna",
-      lastName: "Nikam",
-      imageUrl: "images/1566972270319.jpg",
-      role: "user",
-      service: "advance",
-      createdDate: "2019-06-24T06:52:59.502Z",
-      modifiedDate: "2019-06-24T06:52:59.502Z",
-      addresses: [
-        {
-          address: "Aurangabad"
-        }
-      ],
-      username: "Krushnanikam26@gmail.com",
-      email: "Krushnanikam26@gmail.com",
-      emailVerified: true,
-      id: "5d10734bd0c1c70040b4b6d7"
-    }
-  },
-  {
-    title: "Dhaval",
-    description: "asdfjljflk",
-    isPined: false,
-    isArchived: false,
-    isDeleted: true,
-    reminder: [],
-    createdDate: "2019-07-06T09:28:52.404Z",
-    modifiedDate: "2019-07-06T09:28:52.404Z",
-    color: "#3FEEE6",
-    label: [],
-    imageUrl: "",
-    linkUrl: "",
-    collaborators: [],
-    id: "5d2069d4042ffb004053e6fa",
-    userId: "5d10734bd0c1c70040b4b6d7",
-    collaberator: [],
-    noteCheckLists: [],
-    noteLabels: [],
-    questionAndAnswerNotes: [],
-    user: {
-      firstName: "Krushna",
-      lastName: "Nikam",
-      imageUrl: "images/1566972270319.jpg",
-      role: "user",
-      service: "advance",
-      createdDate: "2019-06-24T06:52:59.502Z",
-      modifiedDate: "2019-06-24T06:52:59.502Z",
-      addresses: [
-        {
-          address: "Aurangabad"
-        }
-      ],
-      username: "Krushnanikam26@gmail.com",
-      email: "Krushnanikam26@gmail.com",
-      emailVerified: true,
-      id: "5d10734bd0c1c70040b4b6d7"
-    }
-  },
-  {
-    title: "Dhaval",
-    description: "asdfjljflk",
-    isPined: false,
-    isArchived: false,
-    isDeleted: true,
-    reminder: [],
-    createdDate: "2019-07-06T09:28:52.404Z",
-    modifiedDate: "2019-07-06T09:28:52.404Z",
-    color: "#3FEEE6",
-    label: [],
-    imageUrl: "",
-    linkUrl: "",
-    collaborators: [],
-    id: "5d2069d4042ffb004053e6fa",
-    userId: "5d10734bd0c1c70040b4b6d7",
-    collaberator: [],
-    noteCheckLists: [],
-    noteLabels: [],
-    questionAndAnswerNotes: [],
-    user: {
-      firstName: "Krushna",
-      lastName: "Nikam",
-      imageUrl: "images/1566972270319.jpg",
-      role: "user",
-      service: "advance",
-      createdDate: "2019-06-24T06:52:59.502Z",
-      modifiedDate: "2019-06-24T06:52:59.502Z",
-      addresses: [
-        {
-          address: "Aurangabad"
-        }
-      ],
-      username: "Krushnanikam26@gmail.com",
-      email: "Krushnanikam26@gmail.com",
-      emailVerified: true,
-      id: "5d10734bd0c1c70040b4b6d7"
-    }
-  },
-  {
-    title: "Dhaval",
-    description: "asdfjljflk",
-    isPined: false,
-    isArchived: false,
-    isDeleted: true,
-    reminder: [],
-    createdDate: "2019-07-06T09:28:52.404Z",
-    modifiedDate: "2019-07-06T09:28:52.404Z",
-    color: "#3FEEE6",
-    label: [],
-    imageUrl: "",
-    linkUrl: "",
-    collaborators: [],
-    id: "5d2069d4042ffb004053e6fa",
-    userId: "5d10734bd0c1c70040b4b6d7",
-    collaberator: [],
-    noteCheckLists: [],
-    noteLabels: [],
-    questionAndAnswerNotes: [],
-    user: {
-      firstName: "Krushna",
-      lastName: "Nikam",
-      imageUrl: "images/1566972270319.jpg",
-      role: "user",
-      service: "advance",
-      createdDate: "2019-06-24T06:52:59.502Z",
-      modifiedDate: "2019-06-24T06:52:59.502Z",
-      addresses: [
-        {
-          address: "Aurangabad"
-        }
-      ],
-      username: "Krushnanikam26@gmail.com",
-      email: "Krushnanikam26@gmail.com",
-      emailVerified: true,
-      id: "5d10734bd0c1c70040b4b6d7"
-    }
-  },
-  {
-    title: "Dhaval",
-    description: "asdfjljflk",
-    isPined: false,
-    isArchived: false,
-    isDeleted: true,
-    reminder: [],
-    createdDate: "2019-07-06T09:28:52.404Z",
-    modifiedDate: "2019-07-06T09:28:52.404Z",
-    color: "#3FEEE6",
-    label: [],
-    imageUrl: "",
-    linkUrl: "",
-    collaborators: [],
-    id: "5d2069d4042ffb004053e6fa",
-    userId: "5d10734bd0c1c70040b4b6d7",
-    collaberator: [],
-    noteCheckLists: [],
-    noteLabels: [],
-    questionAndAnswerNotes: [],
-    user: {
-      firstName: "Krushna",
-      lastName: "Nikam",
-      imageUrl: "images/1566972270319.jpg",
-      role: "user",
-      service: "advance",
-      createdDate: "2019-06-24T06:52:59.502Z",
-      modifiedDate: "2019-06-24T06:52:59.502Z",
-      addresses: [
-        {
-          address: "Aurangabad"
-        }
-      ],
-      username: "Krushnanikam26@gmail.com",
-      email: "Krushnanikam26@gmail.com",
-      emailVerified: true,
-      id: "5d10734bd0c1c70040b4b6d7"
-    }
-  },
-  {
-    title: "Dhaval",
-    description: "asdfjljflk",
-    isPined: false,
-    isArchived: false,
-    isDeleted: true,
-    reminder: [],
-    createdDate: "2019-07-06T09:28:52.404Z",
-    modifiedDate: "2019-07-06T09:28:52.404Z",
-    color: "#3FEEE6",
-    label: [],
-    imageUrl: "",
-    linkUrl: "",
-    collaborators: [],
-    id: "5d2069d4042ffb004053e6fa",
-    userId: "5d10734bd0c1c70040b4b6d7",
-    collaberator: [],
-    noteCheckLists: [],
-    noteLabels: [],
-    questionAndAnswerNotes: [],
-    user: {
-      firstName: "Krushna",
-      lastName: "Nikam",
-      imageUrl: "images/1566972270319.jpg",
-      role: "user",
-      service: "advance",
-      createdDate: "2019-06-24T06:52:59.502Z",
-      modifiedDate: "2019-06-24T06:52:59.502Z",
-      addresses: [
-        {
-          address: "Aurangabad"
-        }
-      ],
-      username: "Krushnanikam26@gmail.com",
-      email: "Krushnanikam26@gmail.com",
-      emailVerified: true,
-      id: "5d10734bd0c1c70040b4b6d7"
-    }
-  },
-  {
-    title: "Dhaval",
-    description: "asdfjljflk",
-    isPined: false,
-    isArchived: false,
-    isDeleted: true,
-    reminder: [],
-    createdDate: "2019-07-06T09:28:52.404Z",
-    modifiedDate: "2019-07-06T09:28:52.404Z",
-    color: "#3FEEE6",
-    label: [],
-    imageUrl: "",
-    linkUrl: "",
-    collaborators: [],
-    id: "5d2069d4042ffb004053e6fa",
-    userId: "5d10734bd0c1c70040b4b6d7",
-    collaberator: [],
-    noteCheckLists: [],
-    noteLabels: [],
-    questionAndAnswerNotes: [],
-    user: {
-      firstName: "Krushna",
-      lastName: "Nikam",
-      imageUrl: "images/1566972270319.jpg",
-      role: "user",
-      service: "advance",
-      createdDate: "2019-06-24T06:52:59.502Z",
-      modifiedDate: "2019-06-24T06:52:59.502Z",
-      addresses: [
-        {
-          address: "Aurangabad"
-        }
-      ],
-      username: "Krushnanikam26@gmail.com",
-      email: "Krushnanikam26@gmail.com",
-      emailVerified: true,
-      id: "5d10734bd0c1c70040b4b6d7"
-    }
-  },
-  {
-    title: "Dhaval",
-    description: "asdfjljflk",
-    isPined: false,
-    isArchived: false,
-    isDeleted: true,
-    reminder: [],
-    createdDate: "2019-07-06T09:28:52.404Z",
-    modifiedDate: "2019-07-06T09:28:52.404Z",
-    color: "#3FEEE6",
-    label: [],
-    imageUrl: "",
-    linkUrl: "",
-    collaborators: [],
-    id: "5d2069d4042ffb004053e6fa",
-    userId: "5d10734bd0c1c70040b4b6d7",
-    collaberator: [],
-    noteCheckLists: [],
-    noteLabels: [],
-    questionAndAnswerNotes: [],
-    user: {
-      firstName: "Krushna",
-      lastName: "Nikam",
-      imageUrl: "images/1566972270319.jpg",
-      role: "user",
-      service: "advance",
-      createdDate: "2019-06-24T06:52:59.502Z",
-      modifiedDate: "2019-06-24T06:52:59.502Z",
-      addresses: [
-        {
-          address: "Aurangabad"
-        }
-      ],
-      username: "Krushnanikam26@gmail.com",
-      email: "Krushnanikam26@gmail.com",
-      emailVerified: true,
-      id: "5d10734bd0c1c70040b4b6d7"
-    }
-  }
-];
+function UserNotes({ title, notes }) {
+  useEffect(() => {
+    console.log(notes);
+  }, [title]);
+
+  return (
+    <>
+      {notes.length > 0 ? (
+        <Fragment>
+          {title === "Keep" ? (
+            <div>
+              <div
+                style={{
+                  width: "785px",
+                  margin: "auto"
+                }}
+              >
+                <h3
+                  style={{
+                    textAlign: "left",
+                    marginLeft: "15px"
+                  }}
+                >
+                  Pinned
+                </h3>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    width: "785px",
+                    margin: "auto"
+                  }}
+                >
+                  {notes.map(note =>
+                    note.isPined ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "start",
+                          flexDirection: "column",
+                          width: "245px",
+                          border: "1px solid #ebebeb",
+                          borderRadius: "15px",
+                          margin: "15px"
+                        }}
+                      >
+                        <div style={{ padding: "12px 17px 0 18px" }}>
+                          <p
+                            style={{
+                              margin: 0,
+                              wordBreak: "break-all",
+                              textAlign: "left"
+                            }}
+                          >
+                            {note.title}
+                          </p>
+                          <p
+                            style={{
+                              textAlign: "left",
+                              margin: 0,
+                              wordBreak: "break-all",
+                              paddingTop: "12px"
+                            }}
+                          >
+                            {note.description}
+                          </p>
+                        </div>
+
+                        <div
+                          style={{
+                            padding: "10px 12px",
+                            display: "flex",
+                            outline: "none",
+                            height: "22px",
+                            width: "225px",
+                            justifyContent: "space-between"
+                          }}
+                        >
+                          <AddAlertIcon title="Remind me"></AddAlertIcon>
+                          <PersonAddIcon title="collaberator"></PersonAddIcon>
+                          <ColorLensIcon title="Change color"></ColorLensIcon>
+                          <ImageIcon title="add image"></ImageIcon>
+                          <ArchiveIcon title="archive"></ArchiveIcon>
+                          <MoreVertIcon></MoreVertIcon>
+                        </div>
+                      </div>
+                    ) : (
+                      ""
+                    )
+                  )}
+                </div>
+              </div>
+              <div
+                style={{
+                  width: "785px",
+                  margin: "auto"
+                }}
+              >
+                <h3
+                  style={{
+                    textAlign: "left",
+                    marginLeft: "15px"
+                  }}
+                >
+                  Others
+                </h3>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    width: "785px",
+                    margin: "auto"
+                  }}
+                >
+                  {notes.map(note =>
+                    !note.isPined ? (
+                      <Masonry
+                        style={{
+                          width: "245px",
+
+                          backgroundColor: `${note.color}`,
+                          border: "1px solid #ebebeb",
+                          borderRadius: "15px",
+                          margin: "15px"
+                        }}
+                      >
+                        <div style={{ padding: "12px 17px 0 18px" }}>
+                          <p
+                            style={{
+                              margin: 0,
+                              wordBreak: "break-all",
+                              textAlign: "left"
+                            }}
+                          >
+                            {note.title}
+                          </p>
+                          <p
+                            style={{
+                              textAlign: "left",
+                              margin: 0,
+                              wordBreak: "break-all",
+                              paddingTop: "12px"
+                            }}
+                          >
+                            {note.description}
+                          </p>
+                        </div>
+
+                        <div
+                          style={{
+                            padding: "10px 12px",
+                            display: "flex",
+                            outline: "none",
+                            height: "22px",
+                            width: "225px",
+                            justifyContent: "space-between"
+                          }}
+                        >
+                          <AddAlertIcon title="Remind me"></AddAlertIcon>
+                          <PersonAddIcon title="collaberator"></PersonAddIcon>
+                          <ColorLensIcon title="Change color"></ColorLensIcon>
+                          <ImageIcon title="add image"></ImageIcon>
+                          <ArchiveIcon title="archive"></ArchiveIcon>
+                          <MoreVertIcon></MoreVertIcon>
+                        </div>
+                      </Masonry>
+                    ) : (
+                      ""
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                width: "785px",
+                margin: "auto"
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  width: "785px",
+                  margin: "auto"
+                }}
+              >
+                {notes.map(note => (
+                  <Masonry
+                    style={{
+                      width: "245px",
+
+                      backgroundColor: `${note.color}`,
+                      border: "1px solid #ebebeb",
+                      borderRadius: "15px",
+                      margin: "15px"
+                    }}
+                  >
+                    <div style={{ padding: "12px 17px 0 18px" }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          wordBreak: "break-all",
+                          textAlign: "left"
+                        }}
+                      >
+                        {note.title}
+                      </p>
+                      <p
+                        style={{
+                          textAlign: "left",
+                          margin: 0,
+                          wordBreak: "break-all",
+                          paddingTop: "12px"
+                        }}
+                      >
+                        {note.description}
+                      </p>
+                    </div>
+
+                    <div
+                      style={{
+                        padding: "10px 12px",
+                        display: "flex",
+                        outline: "none",
+                        height: "22px",
+                        width: "225px",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <AddAlertIcon title="Remind me"></AddAlertIcon>
+                      <PersonAddIcon title="collaberator"></PersonAddIcon>
+                      <ColorLensIcon title="Change color"></ColorLensIcon>
+                      <ImageIcon title="add image"></ImageIcon>
+                      <ArchiveIcon title="archive"></ArchiveIcon>
+                      <MoreVertIcon></MoreVertIcon>
+                    </div>
+                  </Masonry>
+                ))}
+              </div>
+            </div>
+          )}
+
+
+        </Fragment>
+      ) : (
+        <Fragment>
+          <h1>No notes fpund</h1>
+        </Fragment>
+      )}
+
+    </>
+  );
+}
 
 export default BodySection;
+
+
+function ColorPopup(props) {
+  const [color, setColor] = useState("");
+
+  function onClose() {
+    console.log("ssss");
+  }
+
+  useEffect(() => {
+    console.log(props, "ssssssssssssssssss------> ");
+  });
+
+  return (
+    // <Popover
+    //   id="color"
+    //   open={props.open1}
+    //   anchorEl={props.colorEl1}
+    //   onClose={onClose}
+    //   anchorOrigin={{
+    //     vertical: "bottom",
+    //     horizontal: "center"
+    //   }}
+    //   transformOrigin={{
+    //     vertical: "top",
+    //     horizontal: "center"
+    //   }}
+    // >
+      <h1>hello color</h1>
+    // </Popover>
+  );
+}

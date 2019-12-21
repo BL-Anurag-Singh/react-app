@@ -113,7 +113,7 @@ export default function EditLabelDialog(props) {
           </div>
         )}
       </div>
-      {props.labelList.map(label => (
+      {props.labelList.length && props.labelList.map(label => (
         <li
           onMouseOver={() => mouseHoverHandler(label)}
           onMouseLeave={() => mouseLeaveHandler(label)}
