@@ -1,8 +1,23 @@
-import React, { useState, Fragment, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Popover from "@material-ui/core/Popover";
 import PlaceIcon from "@material-ui/icons/Place";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
 import KeyboardBackspaceIcon from "@material-ui/icons/KeyboardBackspace";
+
+const reminderDateTime = [
+  {
+    date: "Later Today",
+    time: "8:00 PM"
+  },
+  {
+    date: "Tomorrow",
+    time: "8:00 PM"
+  },
+  {
+    date: "Next Week",
+    time: " Mon, 8:00 PM"
+  }
+];
 
 export default function ReminderPopup(props) {
   const [location, setLocation] = useState(false);
@@ -22,13 +37,15 @@ export default function ReminderPopup(props) {
     setLocation(false);
   }
 
-  function reminderHandler() {
+  function reminderCustomHandler() {
     props.handleClose(locationRef.current.value);
   }
 
-  useEffect(() => {
-    console.log(locationRef.current);
-  }, [location]);
+  function reminderHandler(item) {
+    props.handleClose(item);
+  }
+
+  useEffect(() => {}, [location]);
 
   return (
     <Popover
@@ -54,33 +71,20 @@ export default function ReminderPopup(props) {
           }}
         >
           <h3 style={{ margin: 0 }}>Reminder</h3>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between"
-            }}
-          >
-            <p>Later Today</p>
-            <p>8:00PM</p>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between"
-            }}
-          >
-            <p>Tomorrow</p>
-            <p>8:00PM</p>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between  "
-            }}
-          >
-            <p>Next Week</p>
-            <p>Mon, 8:00PM</p>
-          </div>
+          {reminderDateTime.map((item, i) => (
+            <div
+              key={i}
+              onClick={reminderHandler}
+              style={{
+                display: "flex",
+                justifyContent: "space-between"
+              }}
+            >
+              <p>{item.date}</p>
+              <p>{item.time}</p>
+            </div>
+          ))}
+
           <div
             style={{
               display: "flex"
@@ -149,7 +153,7 @@ export default function ReminderPopup(props) {
               fontSize: "15px",
               marginLeft: "250px"
             }}
-            onClick={reminderHandler}
+            onClick={reminderCustomHandler}
           >
             Save
           </button>

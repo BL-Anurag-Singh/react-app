@@ -12,10 +12,9 @@ import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import ClearOutlinedIcon from "@material-ui/icons/ClearOutlined";
 import "./bodySection.scss";
 import Masonry from "react-masonry-component";
-import fetchData from "../../pages/fakeApi";
 import ReminderPopup from "../../component/popover/reminder";
-// import ColorPopup from "../../component/popover/color";
-import { Popover } from "@material-ui/core";
+import ColorPopup from "../../component/popover/color";
+import AddCollabarator from "../../component/Dialogs/add-collabarator";
 
 const getStyle = toggle => {
   if (toggle) {
@@ -34,8 +33,6 @@ const viewTypes = {
   t: "text"
 };
 
-const resource = fetchData();
-
 function BodySection(props) {
   const [listName, setListName] = useState("");
   const [listItems, setListItems] = useState([]);
@@ -46,13 +43,14 @@ function BodySection(props) {
   const [isInputExpanded, setIsInputExpanded] = useState(false);
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
-  const [pinNote, setPinNote] = useState("");
+  const [pinNote, setPinNote] = useState(false);
   const [remindMe, setRemindMe] = useState("");
   const [collaberator, setCollabarator] = useState([]);
   const [color, setColor] = useState("");
-  const [archive, setArchive] = useState(false);
+  const [isArchive, setIsArchive] = useState(false);
   const [view, setView] = useState(viewTypes["t"]);
   const [toggleInput, setToggleInput] = useState(false);
+  const [openCollabarator, setOpenCollabrator] = useState(false);
 
   function titleHandler(e) {
     setTitle(e.target.value);
@@ -128,7 +126,6 @@ function BodySection(props) {
     const val = listItems.filter(
       task => task.isCompleted === !item.isCompleted
     );
-    console.log(val);
     setListItems(val);
   }
 
@@ -166,6 +163,23 @@ function BodySection(props) {
     console.log(e.target.value);
   }
 
+  function pinNoteHandler() {
+    setPinNote(!pinNote);
+  }
+
+  function archiveHandler() {
+    setIsArchive(!isArchive);
+  }
+
+  function addColabaratorHandler() {
+    setOpenCollabrator(true);
+  }
+
+  function saveCollabrator(list) {
+    setCollabarator(list);
+    setOpenCollabrator(false);
+  }
+
   const handleReminderClick = event => {
     setReminderEl(event.currentTarget);
   };
@@ -195,10 +209,13 @@ function BodySection(props) {
 
   return (
     <div style={getStyle(props.toggle)}>
-      <div className="add-new-note">
+      <div
+        className="add-new-note"
+        style={{ backgroundColor: `${color.value}` }}
+      >
         <div className="add-new-note-section">
           <input
-            style={{ width: "80%" }}
+            style={{ backgroundColor: `${color.value}`, idth: "80%" }}
             className="add-new-note-section-input"
             value={title}
             onKeyPress={titleKeyPressHandler}
@@ -208,7 +225,9 @@ function BodySection(props) {
             type="text"
           />
           {isInputExpanded ? (
-            <ColorizeOutlinedIcon></ColorizeOutlinedIcon>
+            <ColorizeOutlinedIcon
+              onClick={pinNoteHandler}
+            ></ColorizeOutlinedIcon>
           ) : (
             <div>
               <CheckBoxIcon
@@ -258,9 +277,12 @@ function BodySection(props) {
                       style={{ display: "flex", padding: "7px 15px" }}
                     >
                       <input
+                        style={{
+                          backgroundColor: `${color.value}`,
+                          marginRight: "15px"
+                        }}
                         onClick={() => checkBoxClicked(item)}
                         type="checkbox"
-                        style={{ marginRight: "15px" }}
                       />
                       <p style={{ margin: 0, flexGrow: 1, textAlign: "left" }}>
                         {item.title}
@@ -277,7 +299,12 @@ function BodySection(props) {
                     style={{ marginRight: "15px" }}
                   ></AddOutlinedIcon>
                   <input
-                    style={{ border: "none", outline: "none", width: "80%" }}
+                    style={{
+                      border: "none",
+                      outline: "none",
+                      width: "80%",
+                      backgroundColor: `${color.value}`
+                    }}
                     placeholder="List item"
                     type="text"
                     value={listName}
@@ -329,14 +356,21 @@ function BodySection(props) {
                 anchorEl={reminderEl}
                 handleClose={handleReminderClose}
               />
-              <PersonAddIcon></PersonAddIcon>
-              <ColorLensIcon title="Change color" onClick={handleColorClick}>
-                <ColorPopup 
-                 open1 = {colorPopOver}
-                 anchorEl1 = {colorEl}></ColorPopup>
-              </ColorLensIcon>
+              <PersonAddIcon onClick={addColabaratorHandler}></PersonAddIcon>
+              <ColorLensIcon
+                title="Change color"
+                onClick={handleColorClick}
+              ></ColorLensIcon>
+              <ColorPopup
+                open={colorPopOver}
+                anchorEl={colorEl}
+                handleClose={handleColorClose}
+              ></ColorPopup>
               <ImageIcon title="add image"></ImageIcon>
-              <ArchiveIcon title="archive"></ArchiveIcon>
+              <ArchiveIcon
+                title="archive"
+                onClick={archiveHandler}
+              ></ArchiveIcon>
               <MoreVertIcon></MoreVertIcon>
               <button onClick={submitHandler}> Close</button>
             </div>
@@ -344,16 +378,22 @@ function BodySection(props) {
         )}
       </div>
       <Suspense fallback={<h1>Loading Notes...</h1>}>
-        <UserNotes title={props.title} notes={props.notes} />
+        <UserNotes
+          title={props.title}
+          viewType={props.viewType}
+          notes={props.notes}
+        />
       </Suspense>
+      <AddCollabarator
+        open={openCollabarator}
+        saveCollabrator={saveCollabrator}
+        closeCollabratorDialog={() => setOpenCollabrator(false)}
+      />
     </div>
   );
 }
 
-function UserNotes({ title, notes }) {
-  useEffect(() => {
-    console.log(notes);
-  }, [title]);
+function UserNotes({ title, notes, viewType }) {
 
   return (
     <>
@@ -382,15 +422,16 @@ function UserNotes({ title, notes }) {
                     width: "785px",
                     margin: "auto"
                   }}
+                  className={viewType === "list" ? "list-view" : "grid-view"}
                 >
-                  {notes.map(note =>
+                  {notes.map((note, i) =>
                     note.isPined ? (
                       <div
+                        key={i}
                         style={{
                           display: "flex",
                           justifyContent: "start",
                           flexDirection: "column",
-                          width: "245px",
                           border: "1px solid #ebebeb",
                           borderRadius: "15px",
                           margin: "15px"
@@ -464,58 +505,111 @@ function UserNotes({ title, notes }) {
                     margin: "auto"
                   }}
                 >
-                  {notes.map(note =>
+                  {notes.map((note, i) =>
                     !note.isPined ? (
-                      <Masonry
-                        style={{
-                          width: "245px",
-
-                          backgroundColor: `${note.color}`,
-                          border: "1px solid #ebebeb",
-                          borderRadius: "15px",
-                          margin: "15px"
-                        }}
-                      >
-                        <div style={{ padding: "12px 17px 0 18px" }}>
-                          <p
-                            style={{
-                              margin: 0,
-                              wordBreak: "break-all",
-                              textAlign: "left"
-                            }}
-                          >
-                            {note.title}
-                          </p>
-                          <p
-                            style={{
-                              textAlign: "left",
-                              margin: 0,
-                              wordBreak: "break-all",
-                              paddingTop: "12px"
-                            }}
-                          >
-                            {note.description}
-                          </p>
-                        </div>
-
-                        <div
+                      viewType === "grid" ? (
+                        <Masonry
+                          className="grid-view"
+                          key={i}
                           style={{
-                            padding: "10px 12px",
-                            display: "flex",
-                            outline: "none",
-                            height: "22px",
-                            width: "225px",
-                            justifyContent: "space-between"
+                            backgroundColor: `${note.color}`,
+                            border: "1px solid #ebebeb",
+                            borderRadius: "15px",
+                            margin: "15px"
                           }}
                         >
-                          <AddAlertIcon title="Remind me"></AddAlertIcon>
-                          <PersonAddIcon title="collaberator"></PersonAddIcon>
-                          <ColorLensIcon title="Change color"></ColorLensIcon>
-                          <ImageIcon title="add image"></ImageIcon>
-                          <ArchiveIcon title="archive"></ArchiveIcon>
-                          <MoreVertIcon></MoreVertIcon>
+                          <div style={{ padding: "12px 17px 0 18px" }}>
+                            <p
+                              style={{
+                                margin: 0,
+                                wordBreak: "break-all",
+                                textAlign: "left"
+                              }}
+                            >
+                              {note.title}
+                            </p>
+                            <p
+                              style={{
+                                textAlign: "left",
+                                margin: 0,
+                                wordBreak: "break-all",
+                                paddingTop: "12px"
+                              }}
+                            >
+                              {note.description}
+                            </p>
+                          </div>
+
+                          <div
+                            style={{
+                              padding: "10px 12px",
+                              display: "flex",
+                              outline: "none",
+                              height: "22px",
+                              width: "225px",
+                              justifyContent: "space-between"
+                            }}
+                          >
+                            <AddAlertIcon title="Remind me"></AddAlertIcon>
+                            <PersonAddIcon title="collaberator"></PersonAddIcon>
+                            <ColorLensIcon title="Change color"></ColorLensIcon>
+                            <ImageIcon title="add image"></ImageIcon>
+                            <ArchiveIcon title="archive"></ArchiveIcon>
+                            <MoreVertIcon></MoreVertIcon>
+                          </div>
+                        </Masonry>
+                      ) : (
+                        <div
+                          className="list-view"
+                          key={i}
+                          style={{
+                            backgroundColor: `${note.color}`,
+                            border: "1px solid #ebebeb",
+                            borderRadius: "15px",
+                            margin: "15px"
+                          }}
+                        >
+                          <div style={{ padding: "12px 17px 0 18px" }}>
+                            <p
+                              style={{
+                                margin: 0,
+                                wordBreak: "break-all",
+                                textAlign: "left"
+                              }}
+                            >
+                              {note.title}
+                            </p>
+                            <p
+                              style={{
+                                textAlign: "left",
+                                margin: 0,
+                                wordBreak: "break-all",
+                                paddingTop: "12px"
+                              }}
+                            >
+                              {note.description}
+                            </p>
+                          </div>
+
+                          <div
+                            style={{
+                              padding: "10px 12px",
+                              display: "flex",
+                              outline: "none",
+                              height: "22px",
+                              width: "225px",
+                              justifyContent: "space-between"
+                            }}
+                          >
+                            <AddAlertIcon title="Remind me"></AddAlertIcon>
+                            <PersonAddIcon title="collaberator"></PersonAddIcon>
+                            <ColorLensIcon title="Change color"></ColorLensIcon>
+                            <ImageIcon title="add image"></ImageIcon>
+                            <ArchiveIcon title="archive"></ArchiveIcon>
+                            <MoreVertIcon></MoreVertIcon>
+                          </div>
                         </div>
-                      </Masonry>
+                      )
                     ) : (
                       ""
                     )
@@ -538,104 +632,120 @@ function UserNotes({ title, notes }) {
                   margin: "auto"
                 }}
               >
-                {notes.map(note => (
-                  <Masonry
-                    style={{
-                      width: "245px",
-
-                      backgroundColor: `${note.color}`,
-                      border: "1px solid #ebebeb",
-                      borderRadius: "15px",
-                      margin: "15px"
-                    }}
-                  >
-                    <div style={{ padding: "12px 17px 0 18px" }}>
-                      <p
-                        style={{
-                          margin: 0,
-                          wordBreak: "break-all",
-                          textAlign: "left"
-                        }}
-                      >
-                        {note.title}
-                      </p>
-                      <p
-                        style={{
-                          textAlign: "left",
-                          margin: 0,
-                          wordBreak: "break-all",
-                          paddingTop: "12px"
-                        }}
-                      >
-                        {note.description}
-                      </p>
-                    </div>
-
-                    <div
+                {notes.map(note =>
+                  viewType === "grid" ? (
+                    <Masonry
+                      className="grid-view"
                       style={{
-                        padding: "10px 12px",
-                        display: "flex",
-                        outline: "none",
-                        height: "22px",
-                        width: "225px",
-                        justifyContent: "space-between"
+                        backgroundColor: `${note.color}`,
+                        border: "1px solid #ebebeb",
+                        borderRadius: "15px",
+                        margin: "15px"
                       }}
                     >
-                      <AddAlertIcon title="Remind me"></AddAlertIcon>
-                      <PersonAddIcon title="collaberator"></PersonAddIcon>
-                      <ColorLensIcon title="Change color"></ColorLensIcon>
-                      <ImageIcon title="add image"></ImageIcon>
-                      <ArchiveIcon title="archive"></ArchiveIcon>
-                      <MoreVertIcon></MoreVertIcon>
+                      <div style={{ padding: "12px 17px 0 18px" }}>
+                        <p
+                          style={{
+                            margin: 0,
+                            wordBreak: "break-all",
+                            textAlign: "left"
+                          }}
+                        >
+                          {note.title}
+                        </p>
+                        <p
+                          style={{
+                            textAlign: "left",
+                            margin: 0,
+                            wordBreak: "break-all",
+                            paddingTop: "12px"
+                          }}
+                        >
+                          {note.description}
+                        </p>
+                      </div>
+
+                      <div
+                        style={{
+                          padding: "10px 12px",
+                          display: "flex",
+                          outline: "none",
+                          height: "22px",
+                          width: "225px",
+                          justifyContent: "space-between"
+                        }}
+                      >
+                        <AddAlertIcon title="Remind me"></AddAlertIcon>
+                        <PersonAddIcon title="collaberator"></PersonAddIcon>
+                        <ColorLensIcon title="Change color"></ColorLensIcon>
+                        <ImageIcon title="add image"></ImageIcon>
+                        <ArchiveIcon title="archive"></ArchiveIcon>
+                        <MoreVertIcon></MoreVertIcon>
+                      </div>
+                    </Masonry>
+                  ) : (
+                    <div
+                      className="list-view"
+                      style={{
+                        backgroundColor: `${note.color}`,
+                        border: "1px solid #ebebeb",
+                        borderRadius: "15px",
+                        margin: "15px"
+                      }}
+                    >
+                      <div style={{ padding: "12px 17px 0 18px" }}>
+                        <p
+                          style={{
+                            margin: 0,
+                            wordBreak: "break-all",
+                            textAlign: "left"
+                          }}
+                        >
+                          {note.title}
+                        </p>
+                        <p
+                          style={{
+                            textAlign: "left",
+                            margin: 0,
+                            wordBreak: "break-all",
+                            paddingTop: "12px"
+                          }}
+                        >
+                          {note.description}
+                        </p>
+                      </div>
+
+                      <div
+                        style={{
+                          padding: "10px 12px",
+                          display: "flex",
+                          outline: "none",
+                          height: "22px",
+                          width: "225px",
+                          justifyContent: "space-between"
+                        }}
+                      >
+                        <AddAlertIcon title="Remind me"></AddAlertIcon>
+                        <PersonAddIcon title="collaberator"></PersonAddIcon>
+                        <ColorLensIcon title="Change color"></ColorLensIcon>
+                        <ImageIcon title="add image"></ImageIcon>
+                        <ArchiveIcon title="archive"></ArchiveIcon>
+                        <MoreVertIcon></MoreVertIcon>
+                      </div>
                     </div>
-                  </Masonry>
-                ))}
+                  )
+                )}
               </div>
             </div>
           )}
-
-
         </Fragment>
       ) : (
         <Fragment>
           <h1>No notes fpund</h1>
         </Fragment>
       )}
-
     </>
   );
 }
 
 export default BodySection;
-
-
-function ColorPopup(props) {
-  const [color, setColor] = useState("");
-
-  function onClose() {
-    console.log("ssss");
-  }
-
-  useEffect(() => {
-    console.log(props, "ssssssssssssssssss------> ");
-  });
-
-  return (
-    // <Popover
-    //   id="color"
-    //   open={props.open1}
-    //   anchorEl={props.colorEl1}
-    //   onClose={onClose}
-    //   anchorOrigin={{
-    //     vertical: "bottom",
-    //     horizontal: "center"
-    //   }}
-    //   transformOrigin={{
-    //     vertical: "top",
-    //     horizontal: "center"
-    //   }}
-    // >
-      <h1>hello color</h1>
-    // </Popover>
-  );
-}

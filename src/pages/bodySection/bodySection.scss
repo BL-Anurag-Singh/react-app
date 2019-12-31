@@ -28,7 +28,17 @@
         padding: 7px 25px;
         border-top: 1px solid #e0e0e0;
         border-bottom: 1px solid #e0e0e0;
-      } 
+      }
     }
   }
+}
+
+.list-view {
+  flex-direction: column;
+  width: 100% !important;
+  height: 156px;
+}
+
+.grid-view {
+  width: 245px;
 }

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// import MenuIcon from "@material-ui/icons/Menu";
 import { useDispatch } from "react-redux";
 import MenuIcon from "@material-ui/icons/Menu";
 import "./header.scss";
@@ -17,8 +16,8 @@ function Header(props) {
   }
 
   useEffect(() => {
-    onBlurEvent()
-  }, [])
+    onBlurEvent();
+  }, []);
 
   function onBlurEvent(e) {
     document.getElementById("searchDiv").style.backgroundColor =
@@ -29,12 +28,13 @@ function Header(props) {
 
   function onSearchClick(e) {
     document.getElementById("searchDiv").style.background = "white";
-    document.getElementById("searchDiv").style.boxShadow = '0 1px 1px 0 rgba(65,69,73,0.1), 0 1px 3px 1px rgba(65,69,73,0.15)';
+    document.getElementById("searchDiv").style.boxShadow =
+      "0 1px 1px 0 rgba(65,69,73,0.1), 0 1px 3px 1px rgba(65,69,73,0.15)";
     document.getElementById("search").style.background = "white";
   }
 
   function onSearchTextChange(e) {
-    console.log(e);
+    setSearchValue(e.target.value);
   }
 
   return (
@@ -86,7 +86,6 @@ function Header(props) {
                 height: "100%",
                 width: "100%"
               }}
-              onChange={props.onSearchValueChange}
             />
           </div>
           <button

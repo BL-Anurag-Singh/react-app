@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, createRef } from "react";
+import React, { useState, useEffect, createRef } from "react";
 import AddIcon from "@material-ui/icons/Add";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
@@ -14,10 +14,6 @@ export default function EditLabelDialog(props) {
 
   const [labelValue, setLabelValue] = useState("");
   const inputRef = createRef();
-  // function changeEditLabelLayout() {
-  //   console.log(labelValue);
-  //   setAddLabel(true);
-  // }
 
   function changeAddLabeleLayout() {
     setAddLabel(false);
@@ -71,12 +67,10 @@ export default function EditLabelDialog(props) {
 
   function labelChangeHandler(e) {
     editedLabel = e.target.value;
-    console.log(e);
   }
 
   function updateLabelHandler(label, e) {
     if (e.key === "Enter") {
-      console.log(editedLabel);
       props.editLabelHandler(label, editedLabel);
     }
   }
@@ -113,87 +107,41 @@ export default function EditLabelDialog(props) {
           </div>
         )}
       </div>
-      {props.labelList.length && props.labelList.map(label => (
-        <li
-          onMouseOver={() => mouseHoverHandler(label)}
-          onMouseLeave={() => mouseLeaveHandler(label)}
-          key={label.index}
-          style={{ listStyleType: "none", padding: "5px 24px" }}
-        >
-          <div>
-            {!label.isHovered && <LabelIcon className="sidebar-icon" />}
-            {label.isHovered && <DeleteIcon></DeleteIcon>}
+      {props.labelList.length &&
+        props.labelList.map(label => (
+          <li
+            onMouseOver={() => mouseHoverHandler(label)}
+            onMouseLeave={() => mouseLeaveHandler(label)}
+            key={label.index}
+            style={{ listStyleType: "none", padding: "5px 24px" }}
+          >
+            <div>
+              {!label.isHovered && <LabelIcon className="sidebar-icon" />}
+              {label.isHovered && <DeleteIcon></DeleteIcon>}
 
-            {!label.isEditable && <span>{label.title}</span>}
-            {label.isEditable && (
-              <input
-                defaultValue={`${label.title}`}
-                onChange={e => labelChangeHandler(e, label)}
-                onKeyPress={e => updateLabelHandler(label, e)}
-              />
-            )}
+              {!label.isEditable && <span>{label.title}</span>}
+              {label.isEditable && (
+                <input
+                  defaultValue={`${label.title}`}
+                  onChange={e => labelChangeHandler(e, label)}
+                  onKeyPress={e => updateLabelHandler(label, e)}
+                />
+              )}
 
-            {!label.isEditable && (
-              <EditIcon
-                onClick={() => changeLabelIconHandler(label, "edit")}
-              ></EditIcon>
-            )}
-            {label.isEditable && (
-              <CheckIcon
-                onClick={() => changeLabelIconHandler(label, "save")}
-              ></CheckIcon>
-            )}
-          </div>
-          {/* <div style={{ display: "flex" }}>
-            {!label.isEditable && (
-              <ViewLabelDialog key={`display-${label.index}`} label={label} />
-            )}
-            {label.isEditable && (
-              <EditLabelDialog1 key={`edit-${label.index}`} label={label} />
-            )}
-          </div> */}
-        </li>
-      ))}
+              {!label.isEditable && (
+                <EditIcon
+                  onClick={() => changeLabelIconHandler(label, "edit")}
+                ></EditIcon>
+              )}
+              {label.isEditable && (
+                <CheckIcon
+                  onClick={() => changeLabelIconHandler(label, "save")}
+                ></CheckIcon>
+              )}
+            </div>
+          </li>
+        ))}
       <button onClick={props.closeDialog}>Done</button>
     </Dialog>
   );
 }
-
-// function ViewLabelDialog({ label }) {
-//   function updateExistingLabel(label) {
-//     console.log(label);
-//   }
-
-//   return (
-//     <div
-//       onMouseOver={() => mouseHoverHandler(label)}
-//       onMouseOver={() => mouseLeaveHandler(label)}
-//     >
-//       {!label.isHovered && <LabelIcon className="sidebar-icon" />}
-//       {label.isHovered && <DeleteIcon></DeleteIcon>}
-//       <span>{label.title}</span>
-
-//       <EditIcon onClick={() => updateExistingLabel(label)}></EditIcon>
-//     </div>
-//   );
-// }
-
-// function EditLabelDialog1({ label }) {
-//   function updateExistingLabel() {}
-//   return (
-//     <div>
-//       <input value={label.title} />
-//       <button
-//         style={{
-//           border: "none",
-//           backgroundColor: "transparent",
-//           margin: "0 5px",
-//           outline: "none"
-//         }}
-//         onClick={() => updateExistingLabel("save", label)}
-//       >
-//         <CheckIcon></CheckIcon>
-//       </button>
-//     </div>
-//   );
-// }

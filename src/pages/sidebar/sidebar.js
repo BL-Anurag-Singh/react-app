@@ -47,7 +47,6 @@ function Sidebar(props) {
   const [labelArray, setLAbelArray] = useState(labelArrayList);
   function editLables() {
     setOpen(true);
-    console.log("inside editable");
   }
 
   function closeDialog() {
@@ -67,7 +66,6 @@ function Sidebar(props) {
 
   function newLabelHandler(label) {
     setLAbelArray([...labelArray, label]);
-    console.log(labelArray);
   }
 
   function editLabelHandler(label, type) {
@@ -106,7 +104,7 @@ function Sidebar(props) {
     } else {
       const modifiedLabelArray = labelArray.map(item => {
         if (label.index === item.index) {
-          item.title = type
+          item.title = type;
           item.isEditable = !label.isEditable;
         }
         return item;
@@ -118,7 +116,7 @@ function Sidebar(props) {
   return (
     <>
       {props.toggle && (
-        <div className="keep-sidebar" style={{ width: "280px" }}>
+        <div className={`keep-sidebar`} style={{ width: "280px" }}>
           <ul className="divider">
             <li id="Keep" onClick={e => onTitleChange("Keep")}>
               <div>

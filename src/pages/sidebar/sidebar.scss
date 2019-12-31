@@ -1,5 +1,13 @@
 .keep-sidebar {
   position: absolute;
+  animation: slide 0.5s forwards;
+  animation-delay: 2s;
+
+  @keyframes slide {
+    100% {
+      left: 0;
+    }
+  }
 }
 
 .divider {
@@ -34,7 +42,7 @@ li {
 }
 
 span {
-    color: black;
+  color: black;
   padding-left: 32px;
   display: inline-block;
   line-height: 40px;
@@ -47,7 +55,7 @@ span {
 }
 
 .sidebar-icon {
-    color: black;
+  color: black;
   height: 24px;
   width: 24px;
   float: left;

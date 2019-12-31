@@ -26,10 +26,10 @@ function Home() {
 
   function onSearchValueChange(e) {
     setFilter(e.target.value);
+    console.log(filter)
   }
 
   function onViewTypeChange(type) {
-    console.log(type);
     type === "list" ? setViewType("grid") : setViewType("list");
   }
 
@@ -80,7 +80,6 @@ function Home() {
                     modifiedNotes.push(note);
                   }
                 });
-                console.log(modifiedNotes);
               }
             });
             setNotes(modifiedNotes);
@@ -105,7 +104,7 @@ function Home() {
           ></Header>
 
           <Sidebar toggle={toogle} onTitleChange={onTitleChange}></Sidebar>
-          <BodySection toggle={toogle} title={title} notes={notes}>
+          <BodySection toggle={toogle} title={title} notes={notes} viewType={viewType}>
             {" "}
           </BodySection>
         </div>
